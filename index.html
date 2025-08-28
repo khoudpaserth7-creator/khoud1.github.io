@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="main-title">ລະບົບຈັດການຮ້ານຄ້າ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #f8f9fc;
+        }
+        body {
+            font-family: 'Noto Sans Lao', sans-serif;
+            background-color: var(--secondary-color);
+        }
+        .navbar {
+            background-color: var(--primary-color);
+        }
+        .hero-section {
+            background: linear-gradient(90deg, var(--primary-color) 0%, #2a3b8f 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+        .hero-section h1 {
+            font-size: 2.5rem;
+        }
+        .hero-section p {
+            font-size: 1.25rem;
+        }
+        @media (min-width: 768px) {
+            .hero-section h1 {
+                font-size: 3.5rem;
+            }
+        }
+        .product-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .btn-primary:hover {
+            background-color: #2a3b8f;
+            border-color: #2a3b8f;
+        }
+        .admin-panel {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
+        .admin-panel-content {
+            display: none;
+        }
+        .nav-pills .nav-link.active, .nav-pills .nav-link:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+        .nav-pills .nav-link {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        .tab-content {
+            padding: 1.5rem 0.5rem;
+            background: #f8f9fc;
+            border-radius: 0 0 10px 10px;
+        }
+        /* New styles for a better-looking contact section */
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background-color: #fff;
+            border: 1px solid #e1e5eb;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .contact-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .contact-item i {
+            font-size: 1.25rem;
+            margin-right: 15px;
+            color: var(--primary-color);
+            width: 25px;
+            text-align: center;
+        }
+        /* Adjustments for centered text inside contact item */
+        .contact-item a {
+            font-weight: bold;
+            color: #333;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .contact-item a.large-text {
+            flex-grow: 1; /* Make the link take up available space */
+            text-align: center; /* Center the text */
+            font-size: 1.25rem; /* Adjust as needed */
+        }
+        /* Style for contact images */
+        .contact-item img {
+            width: 24px; /* Adjust size as needed */
+            height: 24px;
+            margin-right: 15px;
+        }
+        
+        /* New button styles for contact popup */
+        .contact-popup-btn {
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .contact-popup-btn i {
+            margin-right: 10px;
+            font-size: 1.4rem;
+        }
+        .btn-facebook {
+            background-color: #3b5998;
+            border-color: #3b5998;
+        }
+        .btn-facebook:hover {
+            background-color: #2d4373;
+        }
+        .btn-messenger {
+            background-color: #0078FF;
+            border-color: #0078FF;
+        }
+        .btn-messenger:hover {
+            background-color: #005bb7;
+        }
+        .btn-whatsapp {
+            background-color: #25D366;
+            border-color: #25D366;
+        }
+        .btn-whatsapp:hover {
+            background-color: #128C7E;
+        }
+        /* CSS to center the modal vertically on all devices */
+        .modal-dialog.modal-dialog-centered {
+            display: flex;
+            align-items: center;
+            min-height: calc(100% - 1rem);
+            margin: 0.5rem auto;
+        }
+        @media (min-width: 576px) {
+            .modal-dialog.modal-dialog-centered {
+                min-height: calc(100% - 3.5rem);
+                margin: 1.75rem auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-store"></i> <span id="website-name">ຮ້ານຄ້າຂອງເຮົາ</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#hero">ໜ້າຫຼັກ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#products">ສິນຄ້າ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact-section">ຕິດຕໍ່</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-light text-primary btn-sm ms-2" href="#" data-bs-toggle="modal" data-bs-target="#adminModal">
+                            <i class="fas fa-cog"></i> ເຂົ້າສູ່ລະບົບ Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section text-center" id="hero">
+        <div class="container">
+            <h1 class="display-4" id="hero-title">ຍິນດີຕ້ອນຮັບສູ່ຮ້ານຄ້າຂອງເຮົາ</h1>
+            <p class="lead" id="hero-subtitle">ສິນຄ້າຄຸນນະພາບສູງ ລາຄາພິເສດ</p>
+        </div>
+    </section>
+
+    <section class="container" id="products">
+        <h2 class="text-center mb-4">ສິນຄ້າຂອງເຮົາ</h2>
+        <div class="row" id="product-list">
+            </div>
+    </section>
+
+    <section class="container" id="contact-section">
+        <h2 class="text-center mb-4">ຕິດຕໍ່ພວກເຮົາ</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="d-grid gap-2" id="contact-buttons">
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="modal fade" id="adminModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">ເຂົ້າສູ່ລະບົບ Admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="login-form">
+                        <div class="alert alert-danger" role="alert" id="login-error" style="display: none;">
+                            ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ!
+                        </div>
+                        <form id="admin-login-form">
+                            <div class="mb-3">
+                                <label class="form-label">ຊື່ຜູ້ໃຊ້</label>
+                                <input type="text" class="form-control" id="username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">ລະຫັດຜ່ານ</label>
+                                <input type="password" class="form-control" id="password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">ເຂົ້າສູ່ລະບົບ</button>
+                        </form>
+                    </div>
+
+                    <div id="admin-panel" class="admin-panel admin-panel-content">
+                        <ul class="nav nav-pills mb-3" id="adminTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="products-tab" data-bs-toggle="pill" data-bs-target="#products" type="button" role="tab" aria-controls="products" aria-selected="true">ຈັດການສິນຄ້າ</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="settings-tab" data-bs-toggle="pill" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">ຕັ້ງຄ່າເວັບໄຊ</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="contacts-tab" data-bs-toggle="pill" data-bs-target="#contacts" type="button" role="tab" aria-controls="contacts" aria-selected="false">ຈັດການການຕິດຕໍ່</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="admins-tab" data-bs-toggle="pill" data-bs-target="#admins" type="button" role="tab" aria-controls="admins" aria-selected="false">ຈັດການ Admin</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="products" role="tabpanel" aria-labelledby="products-tab">
+                                <h5>ຈັດການສິນຄ້າ</h5>
+                                <form id="product-form">
+                                    <input type="hidden" id="product-id">
+                                    <div class="mb-3">
+                                        <label class="form-label">ຊື່ສິນຄ້າ</label>
+                                        <input type="text" class="form-control" id="product-name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">ລາຍລະອຽດ</label>
+                                        <textarea class="form-control" rows="3" id="product-description" required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">ລາຄາ (ກີບ)</label>
+                                        <input type="number" class="form-control" id="product-price" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">ລິ້ງຮູບພາບ</label>
+                                        <input type="text" class="form-control" id="product-image" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100" id="product-submit-btn">ເພີ່ມສິນຄ້າ</button>
+                                </form>
+                                <hr>
+                                <h5>ລາຍການສິນຄ້າ</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>ຊື່ສິນຄ້າ</th>
+                                                <th>ລາຄາ</th>
+                                                <th>ຄຳສັ່ງ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="admin-product-table">
+                                            </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                                <h5>ຕັ້ງຄ່າເວັບໄຊ</h5>
+                                <form id="settings-form">
+                                    <div class="mb-3">
+                                        <label class="form-label">ຊື່ເວັບໄຊ</label>
+                                        <input type="text" class="form-control" id="site-name-input" value="ຮ້ານຄ້າຂອງເຮົາ">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">ຫົວຂໍ້ຫຼັກ</label>
+                                        <input type="text" class="form-control" id="hero-title-input" value="ຍິນດີຕ້ອນຮັບສູ່ຮ້ານຄ້າຂອງເຮົາ">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">ຫົວຂໍ້ຍ່ອຍ</label>
+                                        <input type="text" class="form-control" id="hero-subtitle-input" value="ສິນຄ້າຄຸນນະພາບສູງ ລາຄາພິເສດ">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">ລິ້ງ Facebook (ໜ້າ Contact)</label>
+                                        <input type="text" class="form-control" id="facebook-contact-link-input" placeholder="ຕົວຢ່າງ: facebook.com/yourshopname">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">ລິ້ງ Messenger (ປັອບອັບ)</label>
+                                        <input type="text" class="form-control" id="messenger-link-input" placeholder="ຕົວຢ່າງ: facebook.com/yourshopname">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">ເບີ WhatsApp (ປັອບອັບ)</label>
+                                        <input type="text" class="form-control" id="whatsapp-link-input" placeholder="ຕົວຢ່າງ: +8562012345678">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">ບັນທຶກການປ່ຽນແປງ</button>
+                                </form>
+                            </div>
+
+                            <div class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
+                                <h5>ຈັດການຂໍ້ມູນການຕິດຕໍ່</h5>
+                                <form id="contact-form">
+                                    <input type="hidden" id="contact-id">
+                                    <div class="mb-3">
+                                        <label class="form-label">ຊື່ຊ່ອງທາງ</label>
+                                        <input type="text" class="form-control" id="contact-name-input" placeholder="ເຊັ່ນ: ເບີໂທ, Facebook, Line" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">ລາຍລະອຽດ</label>
+                                        <input type="text" class="form-control" id="contact-detail-input" placeholder="ເຊັ່ນ: +85620xxxxx, facebook.com/shop" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">ລິ້ງຮູບພາບ (ທາງເລືອກ)</label>
+                                        <input type="url" class="form-control" id="contact-image-input" placeholder="ໃສ່ລິ້ງຮູບພາບສຳລັບໄອຄອນ (ທາງເລືອກ)">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100" id="contact-submit-btn">ເພີ່ມຊ່ອງທາງ</button>
+                                </form>
+                                <hr>
+                                <h5>ລາຍການຕິດຕໍ່</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>ຊື່ຊ່ອງທາງ</th>
+                                                <th>ລາຍລະອຽດ</th>
+                                                <th>ຄຳສັ່ງ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="admin-contact-table">
+                                            </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="admins" role="tabpanel" aria-labelledby="admins-tab">
+                                <h5>ຈັດການບັນຊີ Admin</h5>
+                                <form id="admin-management-form">
+                                    <input type="hidden" id="admin-edit-username">
+                                    <div class="mb-3">
+                                        <label class="form-label">ຊື່ຜູ້ໃຊ້</label>
+                                        <input type="text" class="form-control" id="admin-username-input" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">ລະຫັດຜ່ານ</label>
+                                        <input type="password" class="form-control" id="admin-password-input" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">ຢືນຢັນລະຫັດຜ່ານ</label>
+                                        <input type="password" class="form-control" id="admin-confirm-password-input" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100" id="admin-submit-btn">ເພີ່ມ Admin</button>
+                                </form>
+                                <hr>
+                                <h5>ບັນຊີ Admin ທີ່ມີ</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>ຊື່ຜູ້ໃຊ້</th>
+                                                <th>ຄຳສັ່ງ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="admin-table">
+                                            </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="contactOptionsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contactModalTitle">ເລືອກຊ່ອງທາງການຕິດຕໍ່</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p id="contactModalText">ເລືອກຊ່ອງທາງທີ່ສະດວກເພື່ອສັ່ງຊື້ສິນຄ້າ</p>
+                    <div class="d-grid gap-2">
+                        <a id="contact-facebook-modal" class="contact-popup-btn btn-facebook">
+                            <i class="fab fa-facebook"></i> ຕິດຕໍ່ຜ່ານ Facebook
+                        </a>
+                        <a id="contact-messenger-modal" class="contact-popup-btn btn-messenger">
+                            <i class="fab fa-facebook-messenger"></i> ຕິດຕໍ່ຜ່ານ Messenger
+                        </a>
+                        <a id="contact-whatsapp-modal" class="contact-popup-btn btn-whatsapp">
+                            <i class="fab fa-whatsapp"></i> ຕິດຕໍ່ຜ່ານ WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="footer text-center">
+        <div class="container">
+            <p id="footer-text">© 2023 ຮ້ານຄ້າຂອງເຮົາ. ສະຫງວນລິຂະສິດ.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- Core Functions ---
+
+        // ຟັງຊັນສຳລັບການບັນທຶກ ແລະ ອ່ານຂໍ້ມູນ
+        function saveToLocalStorage() {
+            localStorage.setItem('products', JSON.stringify(products));
+            localStorage.setItem('admins', JSON.stringify(admins));
+            localStorage.setItem('websiteSettings', JSON.stringify(websiteSettings));
+            localStorage.setItem('nextProductId', nextProductId);
+        }
+
+        function loadFromLocalStorage() {
+            const savedProducts = localStorage.getItem('products');
+            const savedAdmins = localStorage.getItem('admins');
+            const savedWebsiteSettings = localStorage.getItem('websiteSettings');
+            const savedNextProductId = localStorage.getItem('nextProductId');
+
+            if (savedProducts) {
+                products = JSON.parse(savedProducts);
+            }
+            if (savedAdmins) {
+                admins = JSON.parse(savedAdmins);
+            }
+            if (savedWebsiteSettings) {
+                websiteSettings = JSON.parse(savedWebsiteSettings);
+            }
+            if (savedNextProductId) {
+                nextProductId = parseInt(savedNextProductId);
+            }
+        }
+
+        // Sample data for products, admins, and contacts (will be overwritten if data exists in local storage)
+        let products = [
+            { id: 1, name: 'ໂທລະສັບມືຖື', price: 1500000, description: 'ໂທລະສັບມືຖືຍີ່ຫໍ້ iPhone 13', image: 'https://via.placeholder.com/300' },
+            { id: 2, name: 'ຄອມພິວເຕີ', price: 5000000, description: 'ຄອມພິວເຕີເຮັດວຽກຄົບວົງຈອນ', image: 'https://via.placeholder.com/300' }
+        ];
+
+        let admins = [
+            { username: 'admin', password: '123' },
+            { username: 'manager', password: '123' }
+        ];
+        
+        let websiteSettings = {
+            siteName: 'ຮ້ານຄ້າຂອງເຮົາ',
+            heroTitle: 'ຍິນດີຕ້ອນຮັບສູ່ຮ້ານຄ້າຂອງເຮົາ',
+            heroSubtitle: 'ສິນຄ້າຄຸນນະພາບສູງ ລາຄາພິເສດ',
+            contactLinks: {
+                facebook: 'facebook.com/myshoplao',
+                messenger: 'facebook.com/myshoplao',
+                whatsapp: '+8562055551234'
+            }
+        };
+
+        let nextProductId = 3;
+
+        function renderProducts() {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = '';
+            products.forEach(product => {
+                const formattedPrice = new Intl.NumberFormat('lo-LA').format(product.price);
+                const productCard = `
+                    <div class="col-md-3">
+                        <div class="card product-card">
+                            <img src="${product.image}" class="card-img-top" alt="${product.name}">
+                            <div class="card-body">
+                                <h5 class="card-title">${product.name}</h5>
+                                <p class="card-text">${product.description}</p>
+                                <p class="text-primary fw-bold">${formattedPrice} ກີບ</p>
+                                <button class="btn btn-primary w-100" onclick="showContactOptions('${product.name}', true)">
+                                    <i class="fas fa-shopping-cart"></i> ຊື້ສິນຄ້າ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                productList.innerHTML += productCard;
+            });
+        }
+        
+        // ປັບປຸງຟັງຊັນ renderContacts
+        function renderContacts() {
+            const contactButtons = document.getElementById('contact-buttons');
+            contactButtons.innerHTML = `
+                <a href="https://${websiteSettings.contactLinks.facebook}" target="_blank" class="contact-popup-btn btn-facebook">
+                    <i class="fab fa-facebook"></i> ຕິດຕໍ່ຜ່ານ Facebook
+                </a>
+                <a href="https://m.me/${websiteSettings.contactLinks.messenger.split('/').pop()}" target="_blank" class="contact-popup-btn btn-messenger">
+                    <i class="fab fa-facebook-messenger"></i> ຕິດຕໍ່ຜ່ານ Messenger
+                </a>
+                <a href="https://wa.me/${websiteSettings.contactLinks.whatsapp.replace(/\s/g, '').replace(/\+/g, '')}" target="_blank" class="contact-popup-btn btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> ຕິດຕໍ່ຜ່ານ WhatsApp
+                </a>
+            `;
+        }
+        
+        function renderWebsiteSettings() {
+            document.getElementById('site-name-input').value = websiteSettings.siteName;
+            document.getElementById('hero-title-input').value = websiteSettings.heroTitle;
+            document.getElementById('hero-subtitle-input').value = websiteSettings.heroSubtitle;
+            document.getElementById('facebook-contact-link-input').value = websiteSettings.contactLinks.facebook;
+            document.getElementById('messenger-link-input').value = websiteSettings.contactLinks.messenger;
+            document.getElementById('whatsapp-link-input').value = websiteSettings.contactLinks.whatsapp;
+        }
+
+        function applyWebsiteSettings() {
+            document.getElementById('website-name').textContent = websiteSettings.siteName;
+            document.getElementById('main-title').textContent = websiteSettings.siteName;
+            document.getElementById('footer-text').textContent = `© ${new Date().getFullYear()} ${websiteSettings.siteName}. ສະຫງວນລິຂະສິດ.`;
+            document.getElementById('hero-title').textContent = websiteSettings.heroTitle;
+            document.getElementById('hero-subtitle').textContent = websiteSettings.heroSubtitle;
+            renderContacts();
+        }
+
+        function renderAdminProducts() {
+            const adminTableBody = document.getElementById('admin-product-table');
+            adminTableBody.innerHTML = '';
+            products.forEach(product => {
+                const formattedPrice = new Intl.NumberFormat('lo-LA').format(product.price);
+                const tableRow = `
+                    <tr>
+                        <td>${product.name}</td>
+                        <td>${formattedPrice} ກີບ</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" onclick="editProduct(${product.id})">ແກ້ໄຂ</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">ລຶບ</button>
+                        </td>
+                    </tr>
+                `;
+                adminTableBody.innerHTML += tableRow;
+            });
+        }
+        
+        function renderAdminContacts() {
+            const adminContactTableBody = document.getElementById('admin-contact-table');
+            adminContactTableBody.innerHTML = '';
+            // ເນື່ອງຈາກດຽວນີ້ເຮົາໃຊ້ websiteSettings, ສະນັ້ນຈະບໍ່ມີການເພີ່ມ/ແກ້ໄຂລາຍການຕິດຕໍ່ຫຼາຍອັນ
+        }
+
+        // --- Admin Functions ---
+
+        // Handle Login
+        document.getElementById('admin-login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginError = document.getElementById('login-error');
+            const foundAdmin = admins.find(admin => admin.username === username && admin.password === password);
+
+            if (foundAdmin) {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                // Load existing settings into the form
+                renderWebsiteSettings();
+                renderAdminProducts();
+                renderAdminContacts();
+                renderAdmins();
+            } else {
+                loginError.style.display = 'block';
+            }
+        });
+
+        // Handle Product Form
+        document.getElementById('product-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('product-id').value;
+            const name = document.getElementById('product-name').value;
+            const description = document.getElementById('product-description').value;
+            const price = parseInt(document.getElementById('product-price').value, 10);
+            const image = document.getElementById('product-image').value;
+
+            if (id) {
+                const productIndex = products.findIndex(p => p.id == id);
+                if (productIndex !== -1) {
+                    products[productIndex] = { id: parseInt(id, 10), name, description, price, image };
+                    alert('ແກ້ໄຂສິນຄ້າສຳເລັດແລ້ວ!');
+                }
+                document.getElementById('product-submit-btn').textContent = 'ເພີ່ມສິນຄ້າ';
+            } else {
+                const newProduct = {
+                    id: nextProductId++,
+                    name,
+                    description,
+                    price,
+                    image
+                };
+                products.push(newProduct);
+                alert('ເພີ່ມສິນຄ້າໃໝ່ສຳເລັດແລ້ວ!');
+            }
+            this.reset();
+            document.getElementById('product-id').value = '';
+            saveToLocalStorage(); // Save changes
+            renderProducts();
+            renderAdminProducts();
+        });
+
+        // Handle Site Settings
+        document.getElementById('settings-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            websiteSettings.siteName = document.getElementById('site-name-input').value;
+            websiteSettings.heroTitle = document.getElementById('hero-title-input').value;
+            websiteSettings.heroSubtitle = document.getElementById('hero-subtitle-input').value;
+            websiteSettings.contactLinks.facebook = document.getElementById('facebook-contact-link-input').value;
+            websiteSettings.contactLinks.messenger = document.getElementById('messenger-link-input').value;
+            websiteSettings.contactLinks.whatsapp = document.getElementById('whatsapp-link-input').value;
+            
+            saveToLocalStorage(); // Save changes
+            applyWebsiteSettings();
+            alert('ບັນທຶກການປ່ຽນແປງສຳເລັດແລ້ວ');
+        });
+
+        // Handle Contact Form
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // ຍ້າຍການຈັດການຕິດຕໍ່ໄປທີ່ settings-form
+            alert('ການຈັດການຕິດຕໍ່ຍ້າຍໄປທີ່ແຖບ "ຕັ້ງຄ່າເວັບໄຊ" ແລ້ວ');
+        });
+
+        // --- Functions to be called from HTML ---
+
+        window.editProduct = function(id) {
+            const product = products.find(p => p.id === id);
+            if (product) {
+                document.getElementById('product-id').value = product.id;
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('product-description').value = product.description;
+                document.getElementById('product-price').value = product.price;
+                document.getElementById('product-image').value = product.image;
+                document.getElementById('product-submit-btn').textContent = 'ບັນທຶກການແກ້ໄຂ';
+                const productTab = document.querySelector('#adminTabs button[data-bs-target="#products"]');
+                const adminTabs = new bootstrap.Tab(productTab);
+                adminTabs.show();
+            }
+        };
+
+        window.deleteProduct = function(id) {
+            if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລົບສິນຄ້າອັນນີ້?')) {
+                products = products.filter(product => product.id !== id);
+                saveToLocalStorage(); // Save changes
+                renderProducts();
+                renderAdminProducts();
+                alert('ລົບສິນຄ້າສຳເລັດແລ້ວ!');
+            }
+        };
+
+        window.editContact = function(id) {
+            alert('ການແກ້ໄຂຊ່ອງທາງຕິດຕໍ່ຍ້າຍໄປທີ່ແຖບ "ຕັ້ງຄ່າເວັບໄຊ" ແລ້ວ');
+        };
+
+        window.deleteContact = function(id) {
+            alert('ການລົບຊ່ອງທາງຕິດຕໍ່ຍ້າຍໄປທີ່ແຖບ "ຕັ້ງຄ່າເວັບໄຊ" ແລ້ວ');
+        };
+
+        // New function to show contact options
+        window.showContactOptions = function(productName, isFromProduct = false) {
+            const whatsappLink = `https://wa.me/${websiteSettings.contactLinks.whatsapp.replace(/\s/g, '').replace(/\+/g, '')}${isFromProduct ? `?text=ສະບາຍດີ,%20ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ%20${productName}` : ''}`;
+            const messengerLink = `https://m.me/${websiteSettings.contactLinks.messenger.split('/').pop()}`;
+            const facebookLink = `https://facebook.com/${websiteSettings.contactLinks.facebook.split('/').pop()}`;
+
+            document.getElementById('contact-whatsapp-modal').href = whatsappLink;
+            document.getElementById('contact-messenger-modal').href = messengerLink;
+            document.getElementById('contact-facebook-modal').href = facebookLink;
+            
+            const contactOptionsModal = new bootstrap.Modal(document.getElementById('contactOptionsModal'));
+            contactOptionsModal.show();
+        };
+
+        // --- Admin Management Functions ---
+
+        function renderAdmins() {
+            const adminTableBody = document.getElementById('admin-table');
+            adminTableBody.innerHTML = '';
+            admins.forEach(admin => {
+                const tableRow = `
+                    <tr>
+                        <td>${admin.username}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" onclick="changePassword('${admin.username}')">ປ່ຽນລະຫັດ</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteAdmin('${admin.username}')">ລຶບ</button>
+                        </td>
+                    </tr>
+                `;
+                adminTableBody.innerHTML += tableRow;
+            });
+        }
+
+        document.getElementById('admin-management-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const usernameInput = document.getElementById('admin-username-input');
+            const passwordInput = document.getElementById('admin-password-input');
+            const confirmPasswordInput = document.getElementById('admin-confirm-password-input');
+
+            const newUsername = usernameInput.value;
+            const newPassword = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (newPassword !== confirmPassword) {
+                alert('ລະຫັດຜ່ານບໍ່ກົງກັນ!');
+                return;
+            }
+
+            if (admins.some(admin => admin.username === newUsername)) {
+                alert('ຊື່ຜູ້ໃຊ້ນີ້ມີຢູ່ແລ້ວ!');
+                return;
+            }
+
+            admins.push({ username: newUsername, password: newPassword });
+            alert('ເພີ່ມ Admin ສຳເລັດແລ້ວ!');
+            saveToLocalStorage(); // Save changes
+            renderAdmins();
+            this.reset();
+        });
+
+        window.deleteAdmin = function(username) {
+            if (admins.length <= 1) {
+                alert('ບໍ່ສາມາດລົບ Admin ໄດ້ ເນື່ອງຈາກມີບັນຊີດຽວ!');
+                return;
+            }
+            if (confirm(`ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລົບຜູ້ໃຊ້ "${username}" ?`)) {
+                admins = admins.filter(admin => admin.username !== username);
+                saveToLocalStorage(); // Save changes
+                renderAdmins();
+                alert(`ລົບຜູ້ໃຊ້ "${username}" ສຳເລັດແລ້ວ!`);
+            }
+        };
+
+        window.changePassword = function(username) {
+            const newPassword = prompt(`ປ້ອນລະຫັດຜ່ານໃໝ່ສຳລັບຜູ້ໃຊ້ "${username}":`);
+            if (newPassword && newPassword.length > 0) {
+                const adminToUpdate = admins.find(admin => admin.username === username);
+                if (adminToUpdate) {
+                    adminToUpdate.password = newPassword;
+                    saveToLocalStorage(); // Save changes
+                    alert('ປ່ຽນລະຫັດຜ່ານສຳເລັດແລ້ວ!');
+                }
+            }
+        };
+        
+        // --- Initialize the page ---
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromLocalStorage(); // Load saved data
+            applyWebsiteSettings(); // Apply settings
+            renderProducts();
+            // renderAdmins() will be called after login
+        });
+    </script>
+</body>
+</html>
