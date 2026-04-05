@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FaceID — ระบบจดจำใบหน้า</title>
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+Thai:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a26;
+    --border: #2a2a40;
+    --accent: #00ff88;
+    --accent2: #7b5ea7;
+    --accent3: #ff4466;
+    --text: #e8e8f0;
+    --text-dim: #666680;
+    --scan-line: rgba(0,255,136,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans Thai', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      var(--scan-line) 2px,
+      var(--scan-line) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+    animation: scanlines 8s linear infinite;
+  }
+
+  @keyframes scanlines {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100px; }
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+
+  .logo-icon::before {
+    content: '';
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.8); opacity: 0.5; }
+  }
+
+  .logo h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.2rem;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--text-dim);
+  }
+
+  .status-dot.active { background: var(--accent); animation: pulse 1.5s infinite; }
+  .status-dot.error { background: var(--accent3); }
+
+  /* Main layout */
+  main {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0;
+    height: calc(100vh - 65px);
+  }
+
+  /* Camera section */
+  .camera-section {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-right: 1px solid var(--border);
+  }
+
+  .camera-container {
+    position: relative;
+    flex: 1;
+    background: #000;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    min-height: 300px;
+  }
+
+  .camera-corner {
+    position: absolute;
+    width: 20px; height: 20px;
+    border-color: var(--accent);
+    border-style: solid;
+    z-index: 10;
+  }
+
+  .camera-corner.tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+  .camera-corner.tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+  .camera-corner.bl { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
+  .camera-corner.br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+
+  #video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scaleX(-1);
+  }
+
+  #overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    transform: scaleX(-1);
+    pointer-events: none;
+  }
+
+  .scan-beam {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    top: 0;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .scan-beam.active {
+    opacity: 1;
+    animation: scan 3s ease-in-out infinite;
+  }
+
+  @keyframes scan {
+    0% { top: 0; }
+    100% { top: 100%; }
+  }
+
+  .camera-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+  }
+
+  .camera-placeholder svg { opacity: 0.2; }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+    opacity: 0.1;
+  }
+
+  .btn:hover::before { transform: scaleX(1); }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn.primary {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn.danger {
+    border-color: var(--accent3);
+    color: var(--accent3);
+  }
+
+  .btn.danger:hover { border-color: var(--accent3); color: var(--accent3); }
+  .btn.danger::before { background: var(--accent3); }
+
+  .btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  /* Register panel */
+  .panel {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .input-group {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    font-family: 'Noto Sans Thai', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--accent);
+  }
+
+  input[type="text"]::placeholder {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+  }
+
+  /* Face database */
+  .face-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+  }
+
+  .face-list::-webkit-scrollbar { width: 4px; }
+  .face-list::-webkit-scrollbar-track { background: transparent; }
+  .face-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .face-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    background: var(--surface2);
+    transition: border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .face-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--accent);
+  }
+
+  .face-avatar {
+    width: 40px; height: 40px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .face-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .face-avatar .avatar-icon {
+    font-size: 1.2rem;
+    opacity: 0.4;
+  }
+
+  .face-info { flex: 1; min-width: 0; }
+
+  .face-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .face-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .face-delete {
+    width: 28px; height: 28px;
+    background: none;
+    border: 1px solid transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .face-delete:hover {
+    border-color: var(--accent3);
+    color: var(--accent3);
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    padding: 40px 20px;
+    font-family: 'Space Mono', monospace;
+    line-height: 2;
+  }
+
+  /* Recognition result */
+  .result-panel {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    min-height: 80px;
+  }
+
+  .result-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    margin-bottom: 6px;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .result-dot.known { background: var(--accent); }
+  .result-dot.unknown { background: var(--accent3); }
+
+  .result-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .result-confidence {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 12px 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 9999;
+    white-space: nowrap;
+  }
+
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.error {
+    border-color: var(--accent3);
+    color: var(--accent3);
+  }
+
+  /* Loading overlay */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,15,0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    gap: 20px;
+  }
+
+  .loading-ring {
+    width: 60px; height: 60px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-align: center;
+  }
+
+  /* Mode toggle */
+  .mode-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mode-tab {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+  }
+
+  .mode-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: rgba(0,255,136,0.03);
+  }
+
+  @media (max-width: 768px) {
+    main { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .sidebar { border-top: 1px solid var(--border); border-right: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-ring"></div>
+  <div class="loading-text" id="loadingText">กำลังโหลดโมเดล AI...<br><span style="color:var(--text-dim)">LOADING FACE MODELS</span></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon"></div>
+    <div>
+      <h1>FACE·ID</h1>
+    </div>
+  </div>
+  <div class="status-bar">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText" style="font-family:'Space Mono',monospace;font-size:0.7rem;">INITIALIZING</span>
+  </div>
+</header>
+
+<main>
+  <!-- Camera -->
+  <div class="camera-section">
+    <div class="camera-container" id="cameraContainer">
+      <div class="camera-corner tl"></div>
+      <div class="camera-corner tr"></div>
+      <div class="camera-corner bl"></div>
+      <div class="camera-corner br"></div>
+      <div class="scan-beam" id="scanBeam"></div>
+      <div class="camera-placeholder" id="cameraPlaceholder">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <rect x="8" y="16" width="48" height="36" rx="4" stroke="#00ff88" stroke-width="2"/>
+          <circle cx="32" cy="34" r="10" stroke="#00ff88" stroke-width="2"/>
+          <circle cx="32" cy="34" r="4" fill="#00ff88" opacity="0.3"/>
+          <path d="M24 16 L28 10 H36 L40 16" stroke="#00ff88" stroke-width="2"/>
+        </svg>
+        <span>กดปุ่มเปิดกล้องเพื่อเริ่ม</span>
+      </div>
+      <video id="video" autoplay muted playsinline style="display:none;"></video>
+      <canvas id="overlay"></canvas>
+    </div>
+    <div class="controls">
+      <button class="btn primary" id="btnCamera" onclick="toggleCamera()">⬤ เปิดกล้อง</button>
+      <button class="btn" id="btnRegister" onclick="registerFace()" disabled>+ บันทึกใบหน้า</button>
+      <button class="btn" id="btnCapture" onclick="toggleDetection()" disabled>◉ เริ่มสแกน</button>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="mode-tabs">
+      <button class="mode-tab active" onclick="showPanel('register')">ลงทะเบียน</button>
+      <button class="mode-tab" onclick="showPanel('database')">ฐานข้อมูล</button>
+      <button class="mode-tab" onclick="showPanel('result')">ผลลัพธ์</button>
+    </div>
+
+    <!-- Register panel -->
+    <div class="panel" id="panelRegister">
+      <div class="panel-title">ลงทะเบียนใบหน้าใหม่</div>
+      <div class="input-group">
+        <input type="text" id="nameInput" placeholder="ชื่อบุคคล..." maxlength="30">
+        <button class="btn primary" style="flex:0;padding:10px 16px;white-space:nowrap;" onclick="registerFace()">บันทึก</button>
+      </div>
+      <p style="font-size:0.72rem;color:var(--text-dim);margin-top:10px;line-height:1.6;">
+        เปิดกล้อง → ใส่ชื่อ → กด <strong style="color:var(--text)">+ บันทึกใบหน้า</strong><br>หรือกดปุ่มบันทึกด้านบน
+      </p>
+    </div>
+
+    <!-- Face list -->
+    <div class="face-list" id="panelDatabase">
+      <div class="panel-title">ใบหน้าที่บันทึกไว้</div>
+      <div id="faceList">
+        <div class="empty-state">[ ยังไม่มีข้อมูล ]<br>บันทึกใบหน้าเพื่อเริ่มต้น</div>
+      </div>
+    </div>
+
+    <!-- Result panel -->
+    <div class="result-panel" id="panelResult" style="display:none;flex:1;overflow-y:auto;">
+      <div class="panel-title">ผลการจดจำ</div>
+      <div id="resultList">
+        <div class="empty-state" style="padding:20px;">[ รอการสแกน ]</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ======== State ========
+let faceDescriptors = JSON.parse(localStorage.getItem('faceDB') || '[]');
+let faceMatcher = null;
+let stream = null;
+let isDetecting = false;
+let detectionLoop = null;
+let modelsLoaded = false;
+let facePhotos = JSON.parse(localStorage.getItem('facePhotos') || '{}');
+
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+
+// ======== Init ========
+async function init() {
+  try {
+    setStatus('loading');
+    document.getElementById('loadingText').innerHTML = 
+      'กำลังโหลดโมเดล AI...<br><span style="color:var(--text-dim)">โปรดรอสักครู่</span>';
+    
+    await Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+      faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+      faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+    ]);
+
+    modelsLoaded = true;
+    document.getElementById('loadingOverlay').style.display = 'none';
+    setStatus('ready');
+    buildMatcher();
+    renderFaceList();
+    showToast('โหลดโมเดล AI สำเร็จ ✓');
+  } catch (e) {
+    document.getElementById('loadingText').innerHTML = 
+      `<span style="color:var(--accent3)">โหลดโมเดลล้มเหลว</span><br><span style="font-size:0.65rem;color:var(--text-dim)">${e.message}</span>`;
+    console.error(e);
+  }
+}
+
+// ======== Camera ========
+async function toggleCamera() {
+  const btn = document.getElementById('btnCamera');
+  if (stream) {
+    stopCamera();
+    return;
+  }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ 
+      video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' } 
+    });
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+    await video.play();
+    video.style.display = 'block';
+    document.getElementById('cameraPlaceholder').style.display = 'none';
+
+    // Resize overlay
+    video.addEventListener('loadedmetadata', () => {
+      const overlay = document.getElementById('overlay');
+      overlay.width = video.videoWidth;
+      overlay.height = video.videoHeight;
+      overlay.style.position = 'absolute';
+      overlay.style.top = '0'; overlay.style.left = '0';
+      overlay.style.width = '100%'; overlay.style.height = '100%';
+    });
+
+    btn.textContent = '◼ ปิดกล้อง';
+    btn.classList.add('danger');
+    document.getElementById('btnRegister').disabled = false;
+    document.getElementById('btnCapture').disabled = false;
+    setStatus('active');
+  } catch (e) {
+    showToast('ไม่สามารถเข้าถึงกล้องได้: ' + e.message, true);
+  }
+}
+
+function stopCamera() {
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+  }
+  isDetecting = false;
+  clearInterval(detectionLoop);
+  document.getElementById('scanBeam').classList.remove('active');
+  document.getElementById('video').style.display = 'none';
+  document.getElementById('cameraPlaceholder').style.display = 'flex';
+  const ctx = document.getElementById('overlay').getContext('2d');
+  ctx.clearRect(0, 0, 9999, 9999);
+  document.getElementById('btnCamera').textContent = '⬤ เปิดกล้อง';
+  document.getElementById('btnCamera').classList.remove('danger');
+  document.getElementById('btnCapture').textContent = '◉ เริ่มสแกน';
+  document.getElementById('btnCapture').classList.remove('danger');
+  document.getElementById('btnRegister').disabled = true;
+  document.getElementById('btnCapture').disabled = true;
+  setStatus('ready');
+}
+
+// ======== Detection ========
+function toggleDetection() {
+  if (isDetecting) {
+    isDetecting = false;
+    clearInterval(detectionLoop);
+    document.getElementById('scanBeam').classList.remove('active');
+    document.getElementById('btnCapture').textContent = '◉ เริ่มสแกน';
+    document.getElementById('btnCapture').classList.remove('danger');
+  } else {
+    if (faceDescriptors.length === 0) {
+      showToast('กรุณาบันทึกใบหน้าก่อนสแกน', true);
+      return;
+    }
+    isDetecting = true;
+    document.getElementById('scanBeam').classList.add('active');
+    document.getElementById('btnCapture').textContent = '◼ หยุดสแกน';
+    document.getElementById('btnCapture').classList.add('danger');
+    showPanel('result');
+    runDetection();
+  }
+}
+
+async function runDetection() {
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('overlay');
+  const ctx = canvas.getContext('2d');
+
+  const detect = async () => {
+    if (!isDetecting || !stream) return;
+    
+    const detections = await faceapi
+      .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.5 }))
+      .withFaceLandmarks()
+      .withFaceDescriptors();
+
+    const dims = { width: video.videoWidth, height: video.videoHeight };
+    const resized = faceapi.resizeResults(detections, dims);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const results = [];
+
+    for (const det of resized) {
+      const box = det.detection.box;
+      const descriptor = det.descriptor;
+      
+      let label = 'ไม่รู้จัก';
+      let confidence = 0;
+      let known = false;
+
+      if (faceMatcher) {
+        const match = faceMatcher.findBestMatch(descriptor);
+        if (match.distance < 0.5) {
+          label = match.label;
+          confidence = Math.round((1 - match.distance) * 100);
+          known = true;
+        }
+      }
+
+      // Draw box
+      ctx.strokeStyle = known ? '#00ff88' : '#ff4466';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(box.x, box.y, box.width, box.height);
+
+      // Corner decorations
+      const cs = 16;
+      ctx.lineWidth = 3;
+      [[box.x, box.y], [box.x+box.width, box.y], 
+       [box.x, box.y+box.height], [box.x+box.width, box.y+box.height]].forEach(([x, y], i) => {
+        ctx.beginPath();
+        const dx = i % 2 === 0 ? 1 : -1;
+        const dy = i < 2 ? 1 : -1;
+        ctx.moveTo(x, y + dy * cs);
+        ctx.lineTo(x, y);
+        ctx.lineTo(x + dx * cs, y);
+        ctx.stroke();
+      });
+
+      // Label background
+      const labelText = known ? `${label} (${confidence}%)` : 'UNKNOWN';
+      ctx.font = '600 13px Space Mono, monospace';
+      const tw = ctx.measureText(labelText).width;
+      ctx.fillStyle = known ? 'rgba(0,255,136,0.15)' : 'rgba(255,68,102,0.15)';
+      ctx.fillRect(box.x, box.y - 28, tw + 16, 26);
+      ctx.strokeStyle = known ? '#00ff88' : '#ff4466';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(box.x, box.y - 28, tw + 16, 26);
+      ctx.fillStyle = known ? '#00ff88' : '#ff4466';
+      ctx.fillText(labelText, box.x + 8, box.y - 10);
+
+      results.push({ label, confidence, known });
+    }
+
+    // Update result panel
+    const rl = document.getElementById('resultList');
+    if (results.length === 0) {
+      rl.innerHTML = '<div class="empty-state" style="padding:20px;">[ ไม่พบใบหน้า ]</div>';
+    } else {
+      rl.innerHTML = results.map(r => `
+        <div class="result-item">
+          <div class="result-dot ${r.known ? 'known' : 'unknown'}"></div>
+          <div class="result-text">${r.label}</div>
+          ${r.known ? `<div class="result-confidence">${r.confidence}%</div>` : ''}
+        </div>
+      `).join('');
+    }
+  };
+
+  detectionLoop = setInterval(detect, 200);
+}
+
+// ======== Register ========
+async function registerFace() {
+  if (!stream) { showToast('กรุณาเปิดกล้องก่อน', true); return; }
+  const nameInput = document.getElementById('nameInput');
+  const name = nameInput.value.trim();
+  if (!name) { showToast('กรุณาใส่ชื่อก่อน', true); nameInput.focus(); return; }
+
+  showToast('กำลังบันทึกใบหน้า...');
+  const video = document.getElementById('video');
+  
+  const detections = await faceapi
+    .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.5 }))
+    .withFaceLandmarks()
+    .withFaceDescriptors();
+
+  if (detections.length === 0) {
+    showToast('ไม่พบใบหน้าในกล้อง', true);
+    return;
+  }
+
+  if (detections.length > 1) {
+    showToast('พบหลายใบหน้า กรุณาอยู่คนเดียว', true);
+    return;
+  }
+
+  const descriptor = Array.from(detections[0].descriptor);
+  const id = Date.now();
+
+  // Capture photo thumbnail
+  const tempCanvas = document.createElement('canvas');
+  const det = detections[0].detection.box;
+  const pad = 20;
+  const sx = Math.max(0, video.videoWidth - det.x - det.width - pad);
+  const sy = Math.max(0, det.y - pad);
+  const sw = Math.min(det.width + pad*2, video.videoWidth);
+  const sh = Math.min(det.height + pad*2, video.videoHeight);
+  tempCanvas.width = 60; tempCanvas.height = 60;
+  const tctx = tempCanvas.getContext('2d');
+  tctx.translate(60, 0); tctx.scale(-1, 1); // Mirror fix
+  tctx.drawImage(video, sx, sy, sw, sh, 0, 0, 60, 60);
+  const photoData = tempCanvas.toDataURL('image/jpeg', 0.5);
+  facePhotos[id] = photoData;
+  localStorage.setItem('facePhotos', JSON.stringify(facePhotos));
+
+  faceDescriptors.push({ id, name, descriptor, time: Date.now() });
+  saveDB();
+  buildMatcher();
+  renderFaceList();
+  nameInput.value = '';
+  showToast(`✓ บันทึก "${name}" สำเร็จ`);
+  showPanel('database');
+}
+
+// ======== Matcher ========
+function buildMatcher() {
+  if (faceDescriptors.length === 0) { faceMatcher = null; return; }
+  
+  const grouped = {};
+  faceDescriptors.forEach(f => {
+    if (!grouped[f.name]) grouped[f.name] = [];
+    grouped[f.name].push(new Float32Array(f.descriptor));
+  });
+
+  const labeledDescriptors = Object.entries(grouped).map(([name, descs]) =>
+    new faceapi.LabeledFaceDescriptors(name, descs)
+  );
+  faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6);
+}
+
+// ======== Render ========
+function renderFaceList() {
+  const list = document.getElementById('faceList');
+  if (faceDescriptors.length === 0) {
+    list.innerHTML = '<div class="empty-state">[ ยังไม่มีข้อมูล ]<br>บันทึกใบหน้าเพื่อเริ่มต้น</div>';
+    return;
+  }
+
+  list.innerHTML = faceDescriptors.map((f, i) => `
+    <div class="face-item">
+      <div class="face-avatar">
+        ${facePhotos[f.id] 
+          ? `<img src="${facePhotos[f.id]}" alt="${f.name}">`
+          : `<span class="avatar-icon">👤</span>`}
+      </div>
+      <div class="face-info">
+        <div class="face-name">${f.name}</div>
+        <div class="face-meta">#${String(i+1).padStart(3,'0')} · ${new Date(f.time).toLocaleDateString('th-TH')}</div>
+      </div>
+      <button class="face-delete" onclick="deleteFace(${f.id})" title="ลบ">×</button>
+    </div>
+  `).join('');
+}
+
+function deleteFace(id) {
+  faceDescriptors = faceDescriptors.filter(f => f.id !== id);
+  delete facePhotos[id];
+  saveDB();
+  localStorage.setItem('facePhotos', JSON.stringify(facePhotos));
+  buildMatcher();
+  renderFaceList();
+  showToast('ลบข้อมูลใบหน้าแล้ว');
+}
+
+// ======== Panels ========
+function showPanel(panel) {
+  const tabs = document.querySelectorAll('.mode-tab');
+  const panelMap = { register: 0, database: 1, result: 2 };
+  tabs.forEach((t, i) => t.classList.toggle('active', i === panelMap[panel]));
+  
+  document.getElementById('panelRegister').style.display = panel === 'register' ? 'block' : 'none';
+  document.getElementById('panelDatabase').style.display = panel === 'database' ? 'flex' : 'none';
+  document.getElementById('panelDatabase').style.flexDirection = 'column';
+  document.getElementById('panelResult').style.display = panel === 'result' ? 'block' : 'none';
+}
+
+document.querySelectorAll('.mode-tab').forEach((tab, i) => {
+  const panels = ['register', 'database', 'result'];
+  tab.onclick = () => showPanel(panels[i]);
+});
+
+// ======== Utils ========
+function saveDB() {
+  localStorage.setItem('faceDB', JSON.stringify(faceDescriptors));
+}
+
+function setStatus(state) {
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  const states = {
+    loading: { cls: '', label: 'LOADING...' },
+    ready: { cls: '', label: 'READY' },
+    active: { cls: 'active', label: 'CAMERA ACTIVE' },
+    error: { cls: 'error', label: 'ERROR' },
+  };
+  const s = states[state] || states.ready;
+  dot.className = 'status-dot ' + s.cls;
+  text.textContent = s.label;
+}
+
+let toastTimer;
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toast.className = 'toast'; }, 3000);
+}
+
+// Init
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
