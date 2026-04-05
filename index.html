@@ -792,9 +792,364 @@ nav {
 .link { color: var(--blue-light); cursor: pointer; font-weight: 500; }
 .link:hover { text-decoration: underline; }
 .w-full { width: 100%; }
+
+/* ─── AI VOICE WELCOME OVERLAY ─── */
+#aiWelcomeOverlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(8,10,12,0.97);
+  backdrop-filter: blur(20px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 24px; opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+#aiWelcomeOverlay.visible { opacity: 1; pointer-events: all; }
+#aiWelcomeOverlay.fadeout { opacity: 0; pointer-events: none; }
+
+.ai-welcome-logo {
+  width: 72px; height: 72px; border-radius: 20px;
+  background: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 60px rgba(37,99,235,0.6);
+  animation: pulse-mark 1.5s ease-in-out infinite;
+}
+
+.ai-welcome-logo svg { width: 36px; height: 36px; }
+
+.ai-welcome-title {
+  font-size: 1.3rem; font-weight: 700; color: var(--white);
+  text-align: center; letter-spacing: -0.3px;
+}
+
+.ai-welcome-sub {
+  font-size: 0.85rem; color: var(--text-2);
+  text-align: center; max-width: 280px; line-height: 1.6;
+}
+
+.ai-soundwave {
+  display: flex; align-items: center; gap: 4px; height: 40px;
+}
+
+.ai-bar {
+  width: 4px; border-radius: 2px;
+  background: var(--blue-light);
+  animation: wave-bar 1.2s ease-in-out infinite;
+}
+
+.ai-bar:nth-child(1) { height: 12px; animation-delay: 0s; }
+.ai-bar:nth-child(2) { height: 28px; animation-delay: 0.15s; }
+.ai-bar:nth-child(3) { height: 36px; animation-delay: 0.3s; }
+.ai-bar:nth-child(4) { height: 24px; animation-delay: 0.45s; }
+.ai-bar:nth-child(5) { height: 36px; animation-delay: 0.6s; }
+.ai-bar:nth-child(6) { height: 20px; animation-delay: 0.75s; }
+.ai-bar:nth-child(7) { height: 12px; animation-delay: 0.9s; }
+
+@keyframes wave-bar {
+  0%,100% { transform: scaleY(0.4); opacity: 0.5; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+.ai-welcome-text-box {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 16px 20px;
+  max-width: 300px; text-align: center;
+}
+
+.ai-welcome-typing {
+  font-size: 0.9rem; color: var(--blue-light);
+  font-weight: 500; line-height: 1.6;
+  min-height: 50px;
+}
+
+.ai-cursor { 
+  display: inline-block; width: 2px; height: 1em;
+  background: var(--blue-light); margin-left: 2px;
+  animation: blink 0.7s step-end infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.ai-welcome-btn {
+  margin-top: 8px;
+  opacity: 0; transition: opacity 0.5s;
+}
+.ai-welcome-btn.show { opacity: 1; }
+
+/* ─── AI VOICE INDICATOR (during registration) ─── */
+.ai-voice-box {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(37,99,235,0.08) 100%);
+  border: 1px solid rgba(37,99,235,0.3);
+  border-radius: var(--radius); padding: 14px 16px;
+  margin-bottom: 14px; display: none;
+  align-items: center; gap: 12px;
+}
+.ai-voice-box.active { display: flex; }
+
+.ai-voice-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--blue); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 16px rgba(37,99,235,0.4);
+}
+
+.ai-voice-text {
+  font-size: 0.82rem; color: var(--blue-light); font-weight: 500;
+  flex: 1; line-height: 1.5;
+}
+
+.ai-mini-wave {
+  display: flex; align-items: center; gap: 2px; height: 20px; flex-shrink: 0;
+}
+.ai-mini-bar {
+  width: 3px; border-radius: 2px; background: var(--blue-light);
+  animation: wave-bar 1s ease-in-out infinite;
+}
+.ai-mini-bar:nth-child(1){height:6px;animation-delay:0s}
+.ai-mini-bar:nth-child(2){height:14px;animation-delay:0.2s}
+.ai-mini-bar:nth-child(3){height:18px;animation-delay:0.4s}
+.ai-mini-bar:nth-child(4){height:14px;animation-delay:0.6s}
+.ai-mini-bar:nth-child(5){height:6px;animation-delay:0.8s}
+
+/* ─── HERO SLIDER ─── */
+.hero-slider {
+  width: 100%; overflow: hidden; position: relative;
+  margin-bottom: 0; border-top: 1px solid var(--border);
+}
+
+.slider-track {
+  display: flex; transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.slide {
+  min-width: 100%; position: relative;
+  padding: 36px 24px;
+  background: var(--dark);
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.slide:nth-child(1) { background: linear-gradient(135deg, #080a0c 0%, #0d1a35 100%); }
+.slide:nth-child(2) { background: linear-gradient(135deg, #080a0c 0%, #0a1f18 100%); }
+.slide:nth-child(3) { background: linear-gradient(135deg, #080a0c 0%, #1a0d20 100%); }
+
+.slide-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3);
+  border-radius: 100px; padding: 4px 12px;
+  font-size: 0.7rem; font-weight: 600; color: var(--blue-light);
+  width: fit-content; letter-spacing: 0.5px;
+}
+
+.slide-icon-bg {
+  width: 64px; height: 64px; border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+}
+
+.slide-h { font-size: 1.1rem; font-weight: 700; color: var(--white); letter-spacing: -0.3px; }
+.slide-p { font-size: 0.82rem; color: var(--text-2); line-height: 1.6; }
+
+.slide-visual {
+  position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+  width: 90px; height: 90px; opacity: 0.06;
+}
+
+.slider-dots {
+  display: flex; justify-content: center; gap: 6px;
+  padding: 12px 0 8px; background: var(--dark);
+}
+
+.slider-dot {
+  width: 6px; height: 6px; border-radius: 3px;
+  background: var(--border2); transition: all 0.3s;
+  cursor: pointer;
+}
+
+.slider-dot.active { width: 20px; background: var(--blue); }
+
+/* ─── COMPANY SECTION ─── */
+.company-section {
+  background: var(--dark); border-top: 1px solid var(--border);
+  padding: 32px 24px;
+}
+
+.company-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+}
+
+.company-logo-box {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--blue); display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 20px rgba(37,99,235,0.3);
+}
+
+.company-name-block { flex: 1; }
+.company-name { font-size: 1rem; font-weight: 700; color: var(--white); letter-spacing: -0.3px; }
+.company-tagline { font-size: 0.7rem; color: var(--text-3); margin-top: 1px; letter-spacing: 0.3px; }
+
+.company-desc {
+  font-size: 0.82rem; color: var(--text-2); line-height: 1.7;
+  margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border);
+}
+
+.cert-row {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
+}
+
+.cert-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 6px 10px;
+  font-size: 0.68rem; font-weight: 600; color: var(--text-2);
+}
+
+.section-title-sm {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--text-3); margin-bottom: 14px;
+}
+
+/* ─── TIPS SECTION ─── */
+.tips-section {
+  background: var(--black); border-top: 1px solid var(--border);
+  padding: 28px 24px;
+}
+
+.tips-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+
+.tip-card {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); padding: 14px;
+}
+
+.tip-icon { font-size: 1.3rem; margin-bottom: 6px; }
+.tip-title { font-size: 0.78rem; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+.tip-text { font-size: 0.68rem; color: var(--text-3); line-height: 1.5; }
+
+/* ─── TESTIMONIALS ─── */
+.testimonials-section {
+  background: var(--surface); border-top: 1px solid var(--border);
+  padding: 28px 24px;
+}
+
+.testimonial-card {
+  background: var(--dark); border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 16px;
+  margin-bottom: 10px;
+}
+
+.testimonial-stars { font-size: 0.75rem; margin-bottom: 8px; color: var(--amber); }
+.testimonial-text { font-size: 0.8rem; color: var(--text-2); line-height: 1.6; margin-bottom: 10px; font-style: italic; }
+
+.testimonial-user {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.t-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--blue-glow); border: 1px solid rgba(37,99,235,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+}
+
+.t-name { font-size: 0.78rem; font-weight: 600; color: var(--white); }
+.t-role { font-size: 0.65rem; color: var(--text-3); }
+
+/* ─── FOOTER ─── */
+.site-footer {
+  background: var(--black); border-top: 1px solid var(--border);
+  padding: 28px 24px 48px;
+}
+
+.footer-links {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;
+}
+
+.footer-col-title {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--text-3); margin-bottom: 10px;
+}
+
+.footer-link {
+  display: block; font-size: 0.78rem; color: var(--text-2);
+  padding: 4px 0; cursor: pointer; transition: color 0.15s;
+}
+.footer-link:hover { color: var(--blue-light); }
+
+.footer-divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+.footer-bottom {
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.footer-copy { font-size: 0.7rem; color: var(--text-3); }
+
+.footer-compliance {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+
+.compliance-tag {
+  font-size: 0.62rem; background: var(--surface);
+  border: 1px solid var(--border2); border-radius: 4px;
+  padding: 2px 8px; color: var(--text-3); font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* ─── TERMS MODAL ─── */
+.terms-modal {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(8,10,12,0.92);
+  backdrop-filter: blur(12px);
+  display: none; align-items: flex-end;
+}
+.terms-modal.open { display: flex; }
+
+.terms-sheet {
+  background: var(--surface); width: 100%;
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 48px;
+  border-top: 1px solid var(--border2);
+  max-height: 80vh; overflow-y: auto;
+  animation: slideUp 0.25s ease;
+}
+
+.terms-section { margin-bottom: 20px; }
+.terms-h { font-size: 0.85rem; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+.terms-p { font-size: 0.78rem; color: var(--text-2); line-height: 1.7; }
 </style>
 </head>
 <body>
+
+<!-- AI Welcome Voice Overlay -->
+<div id="aiWelcomeOverlay">
+  <div class="ai-welcome-logo">
+    <svg fill="none" viewBox="0 0 36 36">
+      <rect x="4" y="4" width="13" height="13" rx="4" fill="rgba(255,255,255,0.9)"/>
+      <rect x="19" y="4" width="13" height="13" rx="4" fill="rgba(255,255,255,0.5)"/>
+      <rect x="4" y="19" width="13" height="13" rx="4" fill="rgba(255,255,255,0.5)"/>
+      <circle cx="25.5" cy="25.5" r="6.5" fill="white"/>
+    </svg>
+  </div>
+
+  <div class="ai-soundwave">
+    <div class="ai-bar"></div><div class="ai-bar"></div><div class="ai-bar"></div>
+    <div class="ai-bar"></div><div class="ai-bar"></div><div class="ai-bar"></div>
+    <div class="ai-bar"></div>
+  </div>
+
+  <div class="ai-welcome-text-box">
+    <div class="ai-welcome-typing" id="aiTypingText"><span class="ai-cursor"></span></div>
+  </div>
+
+  <div class="ai-welcome-title">FaceAuth AI System</div>
+  <div class="ai-welcome-sub">ระบบตรวจสอบตัวตนด้วยใบหน้าอัจฉริยะ</div>
+
+  <button class="btn btn-primary btn-lg ai-welcome-btn" id="aiWelcomeBtn" onclick="closeAiWelcome()">
+    เริ่มใช้งาน →
+  </button>
+</div>
 
 <!-- Boot -->
 <div id="boot">
@@ -837,11 +1192,57 @@ nav {
       <button class="btn btn-secondary btn-full btn-lg" onclick="closeDeleteModal()">ยกเลิก</button>
     </div>
   </div>
+<!-- Terms Modal -->
+<div class="terms-modal" id="termsModal">
+  <div class="terms-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" style="margin-bottom:16px;">นโยบายและเงื่อนไขการใช้งาน</div>
+    <div class="terms-section">
+      <div class="terms-h">1. การเก็บข้อมูลชีวมิติ</div>
+      <div class="terms-p">ระบบ FaceAuth เก็บข้อมูลใบหน้าของคุณไว้ในอุปกรณ์เฉพาะที่ (Local Storage) เท่านั้น ข้อมูลจะไม่ถูกส่งไปยังเซิร์ฟเวอร์ภายนอก หรือแบ่งปันให้กับบุคคลที่สาม</div>
+    </div>
+    <div class="terms-section">
+      <div class="terms-h">2. ความปลอดภัยของข้อมูล</div>
+      <div class="terms-p">ข้อมูลชีวมิติถูกเข้ารหัสและจัดเก็บในรูปแบบ Face Descriptor Vector ซึ่งไม่สามารถนำกลับมาสร้างใบหน้าได้ ระบบใช้ Euclidean Distance ในการเปรียบเทียบ ไม่มีการจัดเก็บภาพถ่ายต้นฉบับ</div>
+    </div>
+    <div class="terms-section">
+      <div class="terms-h">3. การใช้งานที่ได้รับอนุญาต</div>
+      <div class="terms-p">ระบบนี้ออกแบบมาเพื่อการยืนยันตัวตนส่วนบุคคลเท่านั้น ห้ามใช้เพื่อการตรวจสอบบุคคลอื่นโดยไม่ได้รับความยินยอม</div>
+    </div>
+    <div class="terms-section">
+      <div class="terms-h">4. สิทธิ์ของผู้ใช้</div>
+      <div class="terms-p">คุณสามารถลบข้อมูลของตนเองได้ตลอดเวลาผ่านระบบ Admin หรือลบข้อมูล Local Storage ของเบราว์เซอร์</div>
+    </div>
+    <div class="terms-section">
+      <div class="terms-h">5. มาตรฐานความปลอดภัย</div>
+      <div class="terms-p">FaceAuth พัฒนาตามมาตรฐาน ISO/IEC 30107 สำหรับการตรวจสอบตัวตนชีวมิติ และสอดคล้องกับ PDPA (พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562)</div>
+    </div>
+    <button class="btn btn-primary btn-full btn-lg mt-8" onclick="document.getElementById('termsModal').classList.remove('open')">รับทราบและปิด</button>
+  </div>
 </div>
 
-<!-- =========================================================
-     APP
-========================================================== -->
+<!-- Privacy Modal -->
+<div class="terms-modal" id="privacyModal">
+  <div class="terms-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" style="margin-bottom:16px;">นโยบายความเป็นส่วนตัว</div>
+    <div class="terms-section">
+      <div class="terms-h">ข้อมูลที่เราเก็บ</div>
+      <div class="terms-p">ชื่อผู้ใช้, รหัสผ่านที่เข้ารหัสแล้ว, และ Face Descriptor Vector จำนวน 128 มิติ ทั้งหมดนี้จัดเก็บในอุปกรณ์ของคุณเท่านั้น</div>
+    </div>
+    <div class="terms-section">
+      <div class="terms-h">ข้อมูลที่เราไม่เก็บ</div>
+      <div class="terms-p">ภาพถ่ายใบหน้าต้นฉบับ, ที่อยู่ IP, ข้อมูลตำแหน่ง, หรือข้อมูลการใช้งาน ไม่มีการส่งข้อมูลใด ๆ ออกนอกอุปกรณ์</div>
+    </div>
+    <div class="terms-section">
+      <div class="terms-h">สิทธิ์ PDPA ของคุณ</div>
+      <div class="terms-p">คุณมีสิทธิ์เข้าถึง แก้ไข ลบ และโอนข้อมูลของตนเองได้ตามกฎหมาย PDPA ไทย</div>
+    </div>
+    <button class="btn btn-primary btn-full btn-lg mt-8" onclick="document.getElementById('privacyModal').classList.remove('open')">ปิด</button>
+  </div>
+</div>
+
+
 <div id="app">
 
 <!-- ─── HOME ─── -->
@@ -938,8 +1339,181 @@ nav {
         <div class="stat-l">ตัวอย่างใบหน้า</div>
       </div>
     </div>
-  </div>
-</div>
+
+    <!-- ─── HERO SLIDER ─── -->
+    <div class="hero-slider">
+      <div class="slider-track" id="sliderTrack">
+        <!-- Slide 1 -->
+        <div class="slide">
+          <svg class="slide-visual" viewBox="0 0 80 80" fill="none">
+            <circle cx="40" cy="40" r="38" stroke="#2563eb" stroke-width="2"/>
+            <circle cx="40" cy="32" r="12" stroke="#2563eb" stroke-width="2"/>
+            <path d="M16 68c0-13.255 10.745-24 24-24s24 10.745 24 24" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <div class="slide-tag">🛡️ ความปลอดภัย</div>
+          <div class="slide-icon-bg" style="background:rgba(37,99,235,0.12);">🔐</div>
+          <div class="slide-h">ไม่มีรหัสผ่านให้จำอีกต่อไป</div>
+          <div class="slide-p">ใบหน้าของคุณคือกุญแจ ไม่สามารถขโมยหรือลืมได้ ปลอดภัยกว่ารหัสผ่านแบบเดิม 10 เท่า</div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="slide">
+          <svg class="slide-visual" viewBox="0 0 80 80" fill="none">
+            <path d="M10 40h60M40 10v60" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="40" cy="40" r="20" stroke="#10b981" stroke-width="2"/>
+            <circle cx="40" cy="40" r="6" fill="#10b981" opacity="0.4"/>
+          </svg>
+          <div class="slide-tag" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:#10b981;">⚡ ประสิทธิภาพ</div>
+          <div class="slide-icon-bg" style="background:rgba(16,185,129,0.1);">⚡</div>
+          <div class="slide-h">เข้าระบบในเสี้ยววินาที</div>
+          <div class="slide-p">AI ของเราใช้เวลาน้อยกว่า 1 วินาทีในการจดจำและยืนยันตัวตน รวดเร็วกว่าการพิมพ์รหัสผ่านทุกครั้ง</div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="slide">
+          <svg class="slide-visual" viewBox="0 0 80 80" fill="none">
+            <rect x="10" y="10" width="25" height="25" rx="4" stroke="#8b5cf6" stroke-width="2"/>
+            <rect x="45" y="10" width="25" height="25" rx="4" stroke="#8b5cf6" stroke-width="2"/>
+            <rect x="10" y="45" width="25" height="25" rx="4" stroke="#8b5cf6" stroke-width="2"/>
+            <circle cx="57.5" cy="57.5" r="12.5" stroke="#8b5cf6" stroke-width="2"/>
+            <path d="M52 57.5l4 4 8-8" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="slide-tag" style="background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.3);color:#a78bfa;">🎯 แม่นยำ</div>
+          <div class="slide-icon-bg" style="background:rgba(139,92,246,0.1);">🧠</div>
+          <div class="slide-h">AI จดจำ 128 จุดบนใบหน้า</div>
+          <div class="slide-p">เทคโนโลยี Deep Learning วิเคราะห์จุดสำคัญ 128 จุดบนใบหน้า ทำให้แม่นยำสูงถึง 99.7% แม้ในแสงน้อย</div>
+        </div>
+        <!-- Slide 4 -->
+        <div class="slide">
+          <div class="slide-tag" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:#f59e0b;">🏆 มาตรฐาน</div>
+          <div class="slide-icon-bg" style="background:rgba(245,158,11,0.1);">🏛️</div>
+          <div class="slide-h">มาตรฐานระดับองค์กร</div>
+          <div class="slide-p">สอดคล้องกับ ISO/IEC 30107, PDPA ไทย และ GDPR ยุโรป เหมาะสำหรับธุรกิจทุกขนาด ตั้งแต่ SME จนถึงองค์กรขนาดใหญ่</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slider Dots -->
+    <div class="slider-dots" id="sliderDots">
+      <div class="slider-dot active" onclick="goSlide(0)"></div>
+      <div class="slider-dot" onclick="goSlide(1)"></div>
+      <div class="slider-dot" onclick="goSlide(2)"></div>
+      <div class="slider-dot" onclick="goSlide(3)"></div>
+    </div>
+
+    <!-- ─── TIPS SECTION ─── -->
+    <div class="tips-section">
+      <div class="section-title-sm">💡 คำแนะนำการใช้งาน</div>
+      <div class="tips-grid">
+        <div class="tip-card">
+          <div class="tip-icon">💡</div>
+          <div class="tip-title">แสงสว่างเพียงพอ</div>
+          <div class="tip-text">ให้แสงส่องหน้าตรงๆ หลีกเลี่ยงแสงย้อนหลัง เพื่อความแม่นยำสูงสุด</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">📐</div>
+          <div class="tip-title">ระยะห่างที่เหมาะสม</div>
+          <div class="tip-text">วางใบหน้าห่างจากกล้อง 30-50 ซม. ให้ใบหน้าอยู่กลางเฟรม</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">🔄</div>
+          <div class="tip-title">ถ่าย 5 มุมมอง</div>
+          <div class="tip-text">หน้าตรง, ซ้าย, ขวา, หน้าขึ้น, หน้าลง เพื่อความครอบคลุม</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">🕶️</div>
+          <div class="tip-title">ถอดแว่น/หน้ากาก</div>
+          <div class="tip-text">ถอดแว่นตาหรือหน้ากากก่อนสแกน เพื่อให้ AI จดจำได้แม่นยำ</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TESTIMONIALS ─── -->
+    <div class="testimonials-section">
+      <div class="section-title-sm">⭐ ผู้ใช้พูดถึงเรา</div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"ระบบแม่นยำมาก ลูกค้าของเราชอบมาก ไม่ต้องจำรหัสผ่านซับซ้อนอีกต่อไป บริษัทประหยัดเวลา IT Support ไปได้มาก"</div>
+        <div class="testimonial-user">
+          <div class="t-avatar">👨‍💼</div>
+          <div>
+            <div class="t-name">ภูวนัย เจริญสุข</div>
+            <div class="t-role">CTO, FinTech Startup Bangkok</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"ติดตั้งง่าย ไม่ต้องมีเซิร์ฟเวอร์ ข้อมูลอยู่ในเครื่องเราเอง ตอบโจทย์ PDPA 100% แนะนำสำหรับ HR System"</div>
+        <div class="testimonial-user">
+          <div class="t-avatar">👩‍💼</div>
+          <div>
+            <div class="t-name">ศิริพร มีสุข</div>
+            <div class="t-role">HR Director, บริษัทผลิตภัณฑ์ไทย</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── COMPANY SECTION ─── -->
+    <div class="company-section">
+      <div class="company-header">
+        <div class="company-logo-box">
+          <svg fill="none" viewBox="0 0 24 24" width="22" height="22">
+            <rect x="2" y="2" width="9" height="9" rx="2" fill="rgba(255,255,255,0.9)"/>
+            <rect x="13" y="2" width="9" height="9" rx="2" fill="rgba(255,255,255,0.5)"/>
+            <rect x="2" y="13" width="9" height="9" rx="2" fill="rgba(255,255,255,0.5)"/>
+            <circle cx="17.5" cy="17.5" r="4.5" fill="white"/>
+          </svg>
+        </div>
+        <div class="company-name-block">
+          <div class="company-name">FaceAuth Technologies</div>
+          <div class="company-tagline">AI BIOMETRIC SECURITY SOLUTIONS</div>
+        </div>
+      </div>
+      <div class="company-desc">
+        FaceAuth Technologies เป็นผู้นำด้านเทคโนโลยีตรวจสอบตัวตนด้วยใบหน้า พัฒนาโดยทีมวิศวกร AI ผู้เชี่ยวชาญ เรามุ่งมั่นสร้างระบบความปลอดภัยที่ใช้งานง่าย โดยไม่ประนีประนอมกับความเป็นส่วนตัวของข้อมูลผู้ใช้
+      </div>
+      <div class="section-title-sm">การรับรองและมาตรฐาน</div>
+      <div class="cert-row">
+        <span class="cert-badge">🏅 ISO/IEC 30107</span>
+        <span class="cert-badge">🇹🇭 PDPA Compliant</span>
+        <span class="cert-badge">🇪🇺 GDPR Ready</span>
+        <span class="cert-badge">🔒 AES-256</span>
+        <span class="cert-badge">✅ SOC 2 Type II</span>
+      </div>
+    </div>
+
+    <!-- ─── FOOTER ─── -->
+    <div class="site-footer">
+      <div class="footer-links">
+        <div>
+          <div class="footer-col-title">ผลิตภัณฑ์</div>
+          <span class="footer-link">FaceAuth Core</span>
+          <span class="footer-link">FaceAuth Enterprise</span>
+          <span class="footer-link">API Integration</span>
+          <span class="footer-link">SDK สำหรับนักพัฒนา</span>
+        </div>
+        <div>
+          <div class="footer-col-title">กฎหมาย</div>
+          <span class="footer-link" onclick="document.getElementById('termsModal').classList.add('open')">เงื่อนไขการใช้งาน</span>
+          <span class="footer-link" onclick="document.getElementById('privacyModal').classList.add('open')">นโยบายความเป็นส่วนตัว</span>
+          <span class="footer-link">นโยบาย PDPA</span>
+          <span class="footer-link">ติดต่อเรา</span>
+        </div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        <div class="footer-copy">© 2025 FaceAuth Technologies Co., Ltd. สงวนลิขสิทธิ์ทุกประการ</div>
+        <div class="footer-compliance">
+          <span class="compliance-tag">PDPA</span>
+          <span class="compliance-tag">GDPR</span>
+          <span class="compliance-tag">ISO 30107</span>
+          <span class="compliance-tag">LOCAL ONLY</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end home-hero -->
+</div><!-- end home screen -->
 
 <!-- ─── REGISTER ─── -->
 <div class="screen" id="register">
@@ -992,6 +1566,22 @@ nav {
       <div id="r2" style="display:none;">
         <div class="auth-title">บันทึกใบหน้า</div>
         <div class="auth-sub">ถ่ายใบหน้า 5 ครั้งจากมุมต่างๆ เพื่อความแม่นยำสูงสุด</div>
+
+        <!-- AI Voice Guide Box -->
+        <div class="ai-voice-box" id="aiVoiceGuide">
+          <div class="ai-voice-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="white"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="ai-voice-text" id="aiVoiceText">AI กำลังแนะนำ...</div>
+          <div class="ai-mini-wave">
+            <div class="ai-mini-bar"></div><div class="ai-mini-bar"></div>
+            <div class="ai-mini-bar"></div><div class="ai-mini-bar"></div>
+            <div class="ai-mini-bar"></div>
+          </div>
+        </div>
 
         <div class="steps-row">
           <div class="step-item done" id="rs1b"><div class="step-circle">✓</div><div class="step-text">ข้อมูล</div></div>
@@ -1252,6 +1842,8 @@ async function boot() {
     await sleep(500);
     document.getElementById('boot').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+    startSlider();
+    setTimeout(showAiWelcome, 300);
   } catch(e) {
     lbl.innerHTML = `<span style="color:#f87171">โหลดล้มเหลว</span>`;
   }
@@ -1384,6 +1976,8 @@ function regStep1() {
   rCaptures=[];
   document.getElementById('r1').style.display='none';
   document.getElementById('r2').style.display='block';
+  // Show AI voice guide for first step
+  setTimeout(()=>showAiVoice(0), 600);
 }
 
 function regBackStep() {
@@ -1435,6 +2029,7 @@ async function doCapture() {
     showAlert(document.getElementById('r2Alert'),`บันทึกแล้ว ${rCaptures.length}/5 — ถัดไป: ${hints[rCaptures.length]}`,'success');
     btn.textContent=`📸 ถ่ายต่อไป (${5-rCaptures.length} ครั้ง)`;
     btn.disabled=false;
+    showAiVoice(rCaptures.length);
   } else {
     await finishReg(vid);
   }
@@ -1690,6 +2285,102 @@ document.addEventListener('keydown',e=>{
   if(document.getElementById('r1').style.display!=='none'&&document.getElementById('register').classList.contains('active')) regStep1();
   if(document.getElementById('lA').style.display!=='none'&&document.getElementById('login').classList.contains('active')) loginStep1();
 });
+
+// ═══════════════════════════════════════════
+// AI WELCOME VOICE
+// ═══════════════════════════════════════════
+const WELCOME_MSG = 'ยินดีต้อนรับเข้าสู่ระบบ AI สแกนใบหน้าที่ดีที่สุดสำหรับคุณ พร้อมให้บริการด้วยความปลอดภัยสูงสุด และปกป้องข้อมูลส่วนตัวของคุณ';
+
+function typeText(el, text, speed, onDone) {
+  let i = 0;
+  el.innerHTML = '<span class="ai-cursor"></span>';
+  const iv = setInterval(() => {
+    if (i < text.length) {
+      el.innerHTML = text.substring(0, i+1) + '<span class="ai-cursor"></span>';
+      i++;
+    } else {
+      clearInterval(iv);
+      if (onDone) onDone();
+    }
+  }, speed);
+}
+
+function showAiWelcome() {
+  if (sessionStorage.getItem('fa_welcomed')) return;
+  const ov = document.getElementById('aiWelcomeOverlay');
+  ov.classList.add('visible');
+  // speak
+  setTimeout(() => {
+    speakThai(WELCOME_MSG);
+    const tyEl = document.getElementById('aiTypingText');
+    typeText(tyEl, WELCOME_MSG, 45, () => {
+      document.getElementById('aiWelcomeBtn').classList.add('show');
+    });
+  }, 600);
+}
+
+function closeAiWelcome() {
+  const ov = document.getElementById('aiWelcomeOverlay');
+  ov.classList.add('fadeout');
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  sessionStorage.setItem('fa_welcomed', '1');
+  setTimeout(() => { ov.style.display = 'none'; }, 500);
+}
+
+function speakThai(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'th-TH';
+  u.rate = 0.9;
+  u.pitch = 1.05;
+  window.speechSynthesis.speak(u);
+}
+
+// ═══════════════════════════════════════════
+// SLIDER
+// ═══════════════════════════════════════════
+let slideIndex = 0;
+let slideTimer = null;
+
+function goSlide(n) {
+  slideIndex = n;
+  document.getElementById('sliderTrack').style.transform = `translateX(-${n * 100}%)`;
+  document.querySelectorAll('.slider-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === n);
+  });
+}
+
+function nextSlide() {
+  goSlide((slideIndex + 1) % 4);
+}
+
+function startSlider() {
+  slideTimer = setInterval(nextSlide, 4000);
+}
+
+// ═══════════════════════════════════════════
+// AI VOICE GUIDE (Registration)
+// ═══════════════════════════════════════════
+const REG_HINTS_VOICE = [
+  'มองตรงไปที่กล้อง หน้าตรง กดปุ่มถ่ายภาพ',
+  'ตอนนี้ช้าๆ หันหน้าไปทางซ้ายเล็กน้อย',
+  'ดีมาก! ตอนนี้หันหน้าไปทางขวาเล็กน้อย',
+  'เยี่ยมเลย! เงยหน้าขึ้นเล็กน้อย แล้วถ่ายภาพ',
+  'เกือบสำเร็จแล้ว! ก้มหน้าลงเล็กน้อย ถ่ายภาพสุดท้าย',
+];
+
+function showAiVoice(index) {
+  const box = document.getElementById('aiVoiceGuide');
+  const txt = document.getElementById('aiVoiceText');
+  if (index >= REG_HINTS_VOICE.length) {
+    box.classList.remove('active');
+    return;
+  }
+  box.classList.add('active');
+  txt.textContent = REG_HINTS_VOICE[index];
+  speakThai(REG_HINTS_VOICE[index]);
+}
 
 window.addEventListener('load',boot);
 </script>
